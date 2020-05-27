@@ -16,6 +16,7 @@ public:
 	void on_exit() override {};
 	void on_enter() override;
 
+	void reset();
 	static void draw_hor_line(int x, int y, Color color = BLACK);
 	static void draw_vert_line(int x, int y, Color color = BLACK);
 	static void draw_lines();

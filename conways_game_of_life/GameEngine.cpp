@@ -18,7 +18,6 @@ GameEngine::GameEngine()
 	InitWindow(WIN_W, WIN_H, "Conway's Game of Life by HaiderRauf69");
 	SetTargetFPS(60);
 	
-
 	states_cache.insert({ StateId::Playing, new PlayState });
 	states_cache.insert({ StateId::Menu, new MenuState });
 	states_cache.insert({ StateId::About, new AboutState });
@@ -58,7 +57,7 @@ void GameEngine::render() const
 	}
 
 	current_state->render();
-
+	
 	EndDrawing();
 }
 
@@ -76,7 +75,7 @@ void GameEngine::main_loop()
 			current_state->set_next_state(StateId::Null);
 			//current_state->on_enter();
 		}
-		
+
 		render();
 	}
 }

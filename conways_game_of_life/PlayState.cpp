@@ -1,6 +1,7 @@
 #include "PlayState.hpp"
 
 #include <iostream>
+#define BLOCK_COLOR RED
 
 bool PlayState::paused = false;
 bool PlayState::started = false;
@@ -41,11 +42,14 @@ void PlayState::handle_input()
 			prev_pos = position;
 		}
 	}
+	else {
+		prev_pos = {0.0f, 0.0f};
+	}
 
 	if (IsKeyPressed(KEY_P)) paused = !paused;
 	else if (IsKeyPressed(KEY_UP)) threshold -= 0.07;
 	else if (IsKeyPressed(KEY_DOWN)) threshold += 0.07;
-
+	else if (IsKeyPressed(KEY_R)) this->reset();
 
 	if (threshold > 1.0) threshold = 1.0;
 	else if (threshold < frame_time) threshold = frame_time;
@@ -95,7 +99,7 @@ void PlayState::render() const
 	for (int y = 0; y < GRID_ROWS; ++y) {
 		for (int x = 0; x < GRID_COLS; ++x) {
 			if (grid(x, y)) {
-				DrawRectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, GREEN);
+				DrawRectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BLOCK_COLOR);
 			}
 		}
 	}
@@ -110,7 +114,7 @@ void PlayState::render() const
 		DrawText("PAUSED! Press P to resume...", 400, 300, 50, BLUE);
 	}
 	else {
-		DrawText("Simulation running...", 500, GRID_H + 4, 25, BLUE);
+		DrawText("Simulation running... Press R to reset", 400, GRID_H + 4, 25, BLUE);
 	}
 	
 }
@@ -153,4 +157,14 @@ void PlayState::draw_lines()
 	for (size_t i = 0; i < GRID_COLS + 1; ++i) {
 		draw_vert_line(i * BLOCK_SIZE, 0, grid_color);
 	}
+}
+
+
+void PlayState::reset()
+{
+	memset(&grid(0, 0), 0, GRID_COLS * GRID_ROWS);
+	paused = false;
+	started = false;
+	start_time = 0.0;
+	generation = 0;
 }

@@ -20,6 +20,8 @@ public:
 	virtual void on_exit() = 0;
 	virtual void on_enter() = 0;
 
+	//void reset();
+
 	StateId id() const { return state_id; }
 	StateId get_next_state() const { return next_state_if; }
 	void set_next_state(StateId id) { next_state_if = id; }
