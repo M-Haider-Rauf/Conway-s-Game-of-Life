@@ -14,7 +14,6 @@ const Color GameEngine::menu_bg = { 255, 205, 184, 255 };
 
 GameEngine::GameEngine()
 	: current_state (nullptr)
-	, next_state (StateId::Null)
 {
 	InitWindow(WIN_W, WIN_H, "Conway's Game of Life by HaiderRauf69");
 	SetTargetFPS(60);
@@ -72,14 +71,12 @@ void GameEngine::main_loop()
 		handle_input();
 		tick();
 
-		next_state = current_state->get_next_state();
-		current_state->set_next_state(StateId::Null);
-		if (next_state != StateId::Null) {
-			current_state = states_cache[next_state];
-			next_state = StateId::Null;
+		if (current_state->get_next_state() != StateId::Null) {
+			current_state = states_cache[current_state->get_next_state()];
+			current_state->set_next_state(StateId::Null);
 			//current_state->on_enter();
 		}
-
+		
 		render();
 	}
 }

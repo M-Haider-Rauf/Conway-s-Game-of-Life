@@ -21,7 +21,6 @@ private:
 	void render() const;
 
 	GameState* current_state;
-	StateId next_state;
 
 	static std::unordered_map<StateId, GameState*> states_cache;
 };
