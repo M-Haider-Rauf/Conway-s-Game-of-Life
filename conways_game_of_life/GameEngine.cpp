@@ -11,6 +11,7 @@
 std::unordered_map<StateId, GameState*> GameEngine::states_cache;
 bool GameEngine::should_quit = false;
 const Color GameEngine::menu_bg = { 255, 205, 184, 255 };
+GameEngine* GameEngine::instance = nullptr;
 
 GameEngine::GameEngine()
 	: current_state (nullptr)
@@ -43,17 +44,25 @@ void GameEngine::handle_input()
 void GameEngine::tick()
 {
 	current_state->tick();
+
+	if (current_state->get_next_state() != StateId::Null) {
+		current_state = states_cache[current_state->get_next_state()];
+		current_state->set_next_state(StateId::Null);
+	}
 }
 
 void GameEngine::render() const
 {
 	BeginDrawing();
 
-	if (current_state->id() == StateId::Menu) {
-		ClearBackground(GameEngine::menu_bg);
-	}
-	else {
+	switch (current_state->id()) {
+	case StateId::Menu:
+		ClearBackground(menu_bg);
+		break;
+
+	default:
 		ClearBackground(BLACK);
+		break;
 	}
 
 	current_state->render();
@@ -66,16 +75,12 @@ void GameEngine::render() const
 
 void GameEngine::main_loop()
 {
+	//Ah yes, the Big 3 of a game loop
 	while (!should_quit) {
 		handle_input();
 		tick();
-
-		if (current_state->get_next_state() != StateId::Null) {
-			current_state = states_cache[current_state->get_next_state()];
-			current_state->set_next_state(StateId::Null);
-			//current_state->on_enter();
-		}
-
 		render();
 	}
+
+	delete instance;
 }

@@ -8,6 +8,7 @@
 class MenuState : public GameState {
 public:
 	MenuState();
+	~MenuState() { UnloadTexture(waifu); }
 
 	void handle_input() override;
 	void tick() override;

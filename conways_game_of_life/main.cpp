@@ -3,6 +3,6 @@
 
 int main()
 {
-	GameEngine ge;
-	ge.main_loop();
+	GameEngine* game_engine = GameEngine::get_instance();
+	game_engine->main_loop();
 }
