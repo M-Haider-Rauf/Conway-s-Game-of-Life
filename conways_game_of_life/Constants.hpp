@@ -1,7 +1,7 @@
 #ifndef CONSTANTS_HPP
 #define CONSTANTS_HPP
 
-constexpr unsigned BLOCK_SIZE = 10u;
+constexpr unsigned BLOCK_SIZE = 20u;
 constexpr unsigned GRID_H = 600u;
 constexpr unsigned GRID_W = 1300u;
 constexpr unsigned WIN_W = GRID_W;

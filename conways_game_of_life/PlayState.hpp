@@ -28,6 +28,11 @@ private:
 	static double start_time;
 	static double threshold;
 	static unsigned generation;
+
+	void save_grid() const;
+	void load_grid();
+
+
 };
 
 

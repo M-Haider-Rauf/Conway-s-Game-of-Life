@@ -1,13 +1,16 @@
 #include "PlayState.hpp"
 
 #include <iostream>
+#include <fstream>
+#include <string>
+
 #define BLOCK_COLOR RED
 
 bool PlayState::paused = false;
 bool PlayState::started = false;
 double PlayState::start_time = 0;
 double PlayState::threshold = 0.2;
-unsigned PlayState::generation = 1;
+unsigned PlayState::generation = 0;
 
 PlayState::PlayState()
 	: GameState(StateId::Playing)
@@ -25,9 +28,17 @@ void PlayState::handle_input()
 	static constexpr double frame_time = 1 / 60.0;
 	static Vector2 prev_pos = {};
 	if (!started) {
+
 		if (IsKeyPressed(KEY_S)) {
 			started = true;
 		}
+		else if (IsKeyPressed(KEY_F2)) {
+			this->save_grid();
+		}
+		else if (IsKeyPressed(KEY_F3)) {
+			this->load_grid();
+		}
+
 		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 			auto position = GetMousePosition();
 			position.x /= BLOCK_SIZE;
@@ -42,9 +53,6 @@ void PlayState::handle_input()
 			prev_pos = position;
 		}
 	}
-	else {
-		prev_pos = {0.0f, 0.0f};
-	}
 
 	if (IsKeyPressed(KEY_P)) paused = !paused;
 	else if (IsKeyPressed(KEY_UP)) threshold -= 0.07;
@@ -57,8 +65,8 @@ void PlayState::handle_input()
 
 void PlayState::tick()
 {	
+	if (!started || paused) return;
 
-	if (paused || !started) return;
 	if (GetTime() - start_time >= threshold) {
 		start_time = GetTime();
 	}
@@ -122,11 +130,6 @@ void PlayState::render() const
 void PlayState::on_enter()
 {
 	grid = Grid<GRID_ROWS, GRID_COLS>();
-	grid(60, 28) = true;//30, 30
-	grid(59, 28) = true;
-	grid(59, 29) = true;
-	grid(58, 29) = true;
-	grid(59, 30) = true;
 
 	start_time = 0;
 
@@ -150,12 +153,40 @@ void PlayState::draw_vert_line(int x, int y, Color color)
 
 void PlayState::draw_lines()
 {
-	static const Color grid_color = { 130, 130, 130, 180 };
+	static constexpr Color grid_color = { 130, 130, 130, 180 };
 	for (size_t i = 0; i < GRID_ROWS + 1; ++i) {
 		draw_hor_line(0, i * BLOCK_SIZE, grid_color);
 	}
-	for (size_t i = 0; i < GRID_COLS + 1; ++i) {
+	for (size_t i = 0; i < GRID_COLS; ++i) {
 		draw_vert_line(i * BLOCK_SIZE, 0, grid_color);
+	}
+}
+
+void PlayState::load_grid()
+{
+	std::ifstream fin("grid.txt");
+	std::string grid_cell;
+
+	memset(&grid(0, 0), 0, GRID_COLS * GRID_ROWS * sizeof(grid(0, 0)));
+
+	while (std::getline(fin, grid_cell)) {
+		int index = grid_cell.find(',');
+		int x = std::stoi (grid_cell.substr(0, index));
+		int y = std::stoi(grid_cell.substr(index + 1));
+		grid(x, y) = true;
+	}
+}
+
+void PlayState::save_grid() const
+{
+	std::ofstream fout("grid.txt");
+	if (!fout) throw "Not file opened";
+	for (size_t i = 0; i < GRID_ROWS; ++i) {
+		for (size_t j = 0; j < GRID_COLS; ++j) {
+			if (grid(i, j)) {
+				fout << i << "," << j << "\n";
+			}
+		}
 	}
 }
 

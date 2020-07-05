@@ -11,7 +11,6 @@
 std::unordered_map<StateId, GameState*> GameEngine::states_cache;
 bool GameEngine::should_quit = false;
 const Color GameEngine::menu_bg = { 255, 205, 184, 255 };
-GameEngine* GameEngine::instance = nullptr;
 
 GameEngine::GameEngine()
 	: current_state (nullptr)
@@ -81,6 +80,4 @@ void GameEngine::main_loop()
 		tick();
 		render();
 	}
-
-	delete instance;
 }

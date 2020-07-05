@@ -15,10 +15,8 @@ public:
 
 	static GameEngine* get_instance()
 	{
-		if (!instance) {
-			instance = new GameEngine;
-		}
-		return instance;
+		static GameEngine engine;
+		return &engine;
 	}
 
 private:
@@ -31,7 +29,6 @@ private:
 	GameState* current_state;
 
 	static std::unordered_map<StateId, GameState*> states_cache;
-	static GameEngine* instance;
 
 	GameEngine();
 };

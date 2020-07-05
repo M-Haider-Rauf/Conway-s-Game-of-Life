@@ -9,15 +9,16 @@ template <int R, int C>
 class Grid {
 public:
 	Grid() : arr{} {}
-	bool& operator()(int x, int y)
+	bool& operator()(int x, int y, bool warp_ = true)
 	{
-		warp(&x, &y);
+		if (warp_) warp(&x, &y);
 		return arr[y][x];
 	}
 
-	bool operator()(int x, int y) const
+	bool operator()(int x, int y, bool warp_ = true) const
 	{
-		warp(&x, &y);
+
+		if (warp_)warp(&x, &y);
 		return arr[y][x];
 	}
 
