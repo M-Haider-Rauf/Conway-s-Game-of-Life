@@ -37,6 +37,7 @@ GameEngine::~GameEngine()
 void GameEngine::handle_input()
 {
 	if (WindowShouldClose()) should_quit = true;
+	if (IsKeyPressed(KEY_C)) TakeScreenshot(TextFormat("%d.bmp", GetTime()));
 	current_state->handle_input();
 }
 
