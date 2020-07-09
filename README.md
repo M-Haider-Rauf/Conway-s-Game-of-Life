@@ -11,9 +11,9 @@ Download the Release folder for the pre-built binary...
 
 # Key Bindings
 * **Mouse** to draw cells
-* *R* to clear grid
-* *S* to start/stop simulation
-* *P* to pause/resume simulation
+* **R** to clear grid
+* **S** to start/stop simulation
+* **P** to pause/resume simulation
 * **C** to capture screenshot
 
 # Screenshots
