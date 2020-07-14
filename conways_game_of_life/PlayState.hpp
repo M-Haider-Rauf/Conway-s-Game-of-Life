@@ -3,7 +3,6 @@
 
 #include "GameState.hpp"
 #include "Constants.hpp"
-#include "Grid.hpp"
 
 class PlayState : public GameState {
 public:
@@ -22,18 +21,16 @@ public:
 	static void draw_lines();
 
 private:
-	Grid<GRID_ROWS, GRID_COLS> grid;
 	static bool paused;
 	static bool started;
 	static double start_time;
 	static double threshold;
 	static unsigned generation;
-
-	void save_grid() const;
-	void load_grid();
-
+	bool* curr_state = nullptr;
 
 };
+
+bool& grid_at(bool* arr, int x, int y);
 
 
 

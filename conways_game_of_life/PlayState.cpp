@@ -14,13 +14,14 @@ unsigned PlayState::generation = 0;
 
 PlayState::PlayState()
 	: GameState(StateId::Playing)
-	, grid {}
+	, curr_state(new bool[GRID_COLS * GRID_ROWS]{} )
 {
 	start_time = 0;
 }
 
 PlayState::~PlayState()
 {
+	delete[] curr_state;
 }
 
 void PlayState::handle_input()
@@ -32,12 +33,6 @@ void PlayState::handle_input()
 		if (IsKeyPressed(KEY_S)) {
 			started = true;
 		}
-		else if (IsKeyPressed(KEY_F2)) {
-			this->save_grid();
-		}
-		else if (IsKeyPressed(KEY_F3)) {
-			this->load_grid();
-		}
 
 		if (IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
 			auto position = GetMousePosition();
@@ -48,7 +43,7 @@ void PlayState::handle_input()
 			position.y = (int)(position.y);
 
 			if (!(prev_pos.x == position.x && prev_pos.y == position.y)) {
-				grid(position.x, position.y) = !grid(position.x, position.y);
+				grid_at(curr_state, position.x, position.y) = !grid_at(curr_state, position.x, position.y);
 			}
 			prev_pos = position;
 		}
@@ -73,32 +68,33 @@ void PlayState::tick()
 	else {
 		return;
 	}
-	auto temp_grid(grid);
+
+	bool* next_state = new bool[GRID_COLS * GRID_ROWS] {};
+	std::memcpy(next_state, curr_state, sizeof *curr_state * GRID_COLS * GRID_ROWS);
 
 	for (int y = 0; y < GRID_ROWS; ++y) {
 		for (int x = 0; x < GRID_COLS; ++x) {
-			int alive_count = grid(x + 1, y) + grid(x - 1, y) + grid(x, y + 1) + grid(x, y - 1) +
-				grid(x + 1, y + 1) + grid(x - 1, y - 1) + grid(x - 1, y + 1) + grid(x + 1, y - 1);
-			if (grid(x, y)) {
-				if (alive_count == 2 || alive_count == 3) {
-					temp_grid(x, y) = true;
-				}
-				else {
-					temp_grid(x, y) = false;
-				}
+			//calculate 8-way neighbours
+			int alive_count = 
+				grid_at(curr_state, x + 1, y) + grid_at(curr_state, x - 1, y) + 
+				grid_at(curr_state, x, y + 1) + grid_at(curr_state, x, y - 1) +
+				grid_at(curr_state, x + 1, y + 1) + grid_at(curr_state, x - 1, y - 1) + 
+				grid_at(curr_state, x - 1, y + 1) + grid_at(curr_state, x + 1, y - 1);
+
+			//calculate next state
+			if (grid_at(curr_state, x, y) && (alive_count < 2 || alive_count > 3)) {
+				grid_at(next_state, x, y) = false;
+
 			}
-			else {
-				if (alive_count == 3) {
-					temp_grid(x, y) = true;
-				}
-				else {
-					temp_grid(x, y) = false;
-				}
+			else if (alive_count == 3) {
+				grid_at(next_state, x, y) = true;
 			}
 		}
 	}
 
-	this->grid = temp_grid;
+	//update current state
+	delete[] this->curr_state;
+	this->curr_state = next_state;
 	++generation;
 }
 
@@ -106,7 +102,7 @@ void PlayState::render() const
 {
 	for (int y = 0; y < GRID_ROWS; ++y) {
 		for (int x = 0; x < GRID_COLS; ++x) {
-			if (grid(x, y)) {
+			if (grid_at(curr_state, x, y)) {
 				DrawRectangle(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE, BLOCK_COLOR);
 			}
 		}
@@ -129,7 +125,8 @@ void PlayState::render() const
 
 void PlayState::on_enter()
 {
-	grid = Grid<GRID_ROWS, GRID_COLS>();
+
+	std::memset(curr_state, 0x0, sizeof *curr_state * GRID_COLS * GRID_ROWS);
 
 	start_time = 0;
 
@@ -153,7 +150,7 @@ void PlayState::draw_vert_line(int x, int y, Color color)
 
 void PlayState::draw_lines()
 {
-	static constexpr Color grid_color = { 130, 130, 130, 180 };
+	static constexpr Color grid_color = { 127, 127, 127, 255 };
 	for (size_t i = 0; i < GRID_ROWS + 1; ++i) {
 		draw_hor_line(0, i * BLOCK_SIZE, grid_color);
 	}
@@ -162,40 +159,25 @@ void PlayState::draw_lines()
 	}
 }
 
-void PlayState::load_grid()
-{
-	std::ifstream fin("grid.txt");
-	std::string grid_cell;
-
-	memset(&grid(0, 0), 0, GRID_COLS * GRID_ROWS * sizeof(grid(0, 0)));
-
-	while (std::getline(fin, grid_cell)) {
-		int index = grid_cell.find(',');
-		int x = std::stoi (grid_cell.substr(0, index));
-		int y = std::stoi(grid_cell.substr(index + 1));
-		grid(x, y) = true;
-	}
-}
-
-void PlayState::save_grid() const
-{
-	std::ofstream fout("grid.txt");
-	if (!fout) throw "Not file opened";
-	for (size_t i = 0; i < GRID_ROWS; ++i) {
-		for (size_t j = 0; j < GRID_COLS; ++j) {
-			if (grid(i, j)) {
-				fout << i << "," << j << "\n";
-			}
-		}
-	}
-}
-
 
 void PlayState::reset()
 {
-	memset(&grid(0, 0), 0, GRID_COLS * GRID_ROWS);
+	memset(curr_state, 0, GRID_COLS * GRID_ROWS * sizeof *curr_state);
 	paused = false;
 	started = false;
 	start_time = 0.0;
 	generation = 0;
+}
+
+bool& grid_at(bool* arr, int x, int y)
+{
+	//wrap around behaiour
+	if (x < 0) x = GRID_COLS - 1;
+	else if (x >= GRID_COLS) x = 0;
+
+	if (y < 0) y = GRID_ROWS - 1;
+	else if (y >= GRID_ROWS) y = 0;
+
+	return arr[y * GRID_COLS + x];
+
 }

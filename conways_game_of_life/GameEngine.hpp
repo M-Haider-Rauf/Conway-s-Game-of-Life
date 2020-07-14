@@ -28,7 +28,7 @@ private:
 
 	GameState* current_state;
 
-	static std::unordered_map<StateId, GameState*> states_cache;
+	std::unordered_map<StateId, GameState*> state_machine;
 
 	GameEngine();
 };
