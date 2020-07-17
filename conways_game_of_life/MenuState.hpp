@@ -8,7 +8,7 @@
 class MenuState : public GameState {
 public:
 	MenuState();
-	~MenuState() { UnloadTexture(waifu); }
+	~MenuState() { UnloadTexture(title_img); }
 
 	void handle_input() override;
 	void tick() override;
@@ -25,7 +25,7 @@ private:
 	std::vector<std::string> menu_texts;
 	size_t state;
 
-	static Texture waifu;
+	static Texture title_img;
 };
 
 #endif // !MENU_STATE_HPP

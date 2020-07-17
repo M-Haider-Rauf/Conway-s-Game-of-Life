@@ -2,14 +2,14 @@
 
 #include "GameEngine.hpp"
 
-Texture MenuState::waifu = {};
+Texture MenuState::title_img;
 
 MenuState::MenuState()
 	: GameState(StateId::Menu)
 	, menu_texts()
 	, state(0)
 {
-	waifu = LoadTexture("img.png");
+	title_img = LoadTexture("img.png");
 	menu_texts.push_back("Play");
 	menu_texts.push_back("About");
 	menu_texts.push_back("Exit");
@@ -46,7 +46,7 @@ void MenuState::tick()
 void MenuState::render() const
 {
 	DrawText("Conway's Game of Life \nby Haider Rauf", 100, 50, 60, VIOLET);
-	DrawTextureEx(waifu, { 800, 0 }, 0.0f, 0.33f, WHITE);
+	DrawTextureEx(title_img, { 800, 0 }, 0.0f, 0.33f, WHITE);
 	for (size_t i = 0; i < menu_texts.size(); ++i) {
 		if (i == this->get_selected()) {
 			DrawText(menu_texts[i].c_str(), 100, i * 100 + 300, 40, RED);
