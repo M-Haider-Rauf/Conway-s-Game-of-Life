@@ -3,7 +3,6 @@
 
 /*
 	Conway's Game of Life by Haider Rauf
-	lolis for life
 */
 
 
