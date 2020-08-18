@@ -17,13 +17,13 @@ public:
 	void on_enter() override;
 	void on_exit() {};
 
-	size_t get_selected() const {
-		return state % menu_texts.size();
+	int get_selected() const {
+		return option % menu_texts.size();
 	}
 
 private:
 	std::vector<std::string> menu_texts;
-	size_t state;
+	int option;
 
 	static Texture title_img;
 };

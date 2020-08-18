@@ -21,11 +21,11 @@ public:
 	static void draw_lines();
 
 private:
-	static bool paused;
-	static bool started;
-	static double start_time;
-	static double threshold;
-	static unsigned generation;
+	bool paused;
+	bool started;
+	double start_time;
+	double threshold;
+	unsigned generation;
 	bool* curr_state = nullptr;
 
 };

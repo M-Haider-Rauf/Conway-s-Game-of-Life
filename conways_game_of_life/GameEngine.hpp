@@ -10,7 +10,7 @@ public:
 	~GameEngine();
 
 	void main_loop();
-	static bool should_quit;
+	bool should_quit;
 	const static Color menu_bg;
 
 	static GameEngine* get_instance()
@@ -18,6 +18,8 @@ public:
 		static GameEngine engine;
 		return &engine;
 	}
+
+	void quit() { should_quit = true; }
 
 private:
 	//Standard Game Loop functions;

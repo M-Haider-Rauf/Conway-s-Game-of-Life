@@ -8,12 +8,12 @@
 #include "MenuState.hpp"
 #include "About.hpp"
 
-bool GameEngine::should_quit = false;
 const Color GameEngine::menu_bg = { 255, 205, 184, 255 };
 
 GameEngine::GameEngine()
 	: current_state (nullptr)
 	, state_machine()
+	, should_quit(false)
 {
 	InitWindow(WIN_W, WIN_H, "Conway's Game of Life by HaiderRauf69");
 	SetTargetFPS(60);
@@ -48,6 +48,7 @@ void GameEngine::tick()
 	if (current_state->get_next_state() != StateId::Null) {
 		current_state = state_machine[current_state->get_next_state()];
 		current_state->set_next_state(StateId::Null);
+		current_state->on_enter();
 	}
 }
 

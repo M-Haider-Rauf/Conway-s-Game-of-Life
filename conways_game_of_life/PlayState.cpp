@@ -4,19 +4,14 @@
 #include <fstream>
 #include <string>
 
+
 #define BLOCK_COLOR RED
 
-bool PlayState::paused = false;
-bool PlayState::started = false;
-double PlayState::start_time = 0;
-double PlayState::threshold = 0.2;
-unsigned PlayState::generation = 0;
 
 PlayState::PlayState()
 	: GameState(StateId::Playing)
-	, curr_state(new bool[GRID_COLS * GRID_ROWS]{} )
+	, curr_state(new bool[GRID_COLS * GRID_ROWS] { 0 })
 {
-	start_time = 0;
 }
 
 PlayState::~PlayState()
@@ -53,6 +48,7 @@ void PlayState::handle_input()
 	else if (IsKeyPressed(KEY_UP)) threshold -= 0.07;
 	else if (IsKeyPressed(KEY_DOWN)) threshold += 0.07;
 	else if (IsKeyPressed(KEY_R)) this->reset();
+	else if (IsKeyPressed(KEY_BACKSPACE)) this->set_next_state(StateId::Menu);
 
 	if (threshold > 1.0) threshold = 1.0;
 	else if (threshold < frame_time) threshold = frame_time;
@@ -129,12 +125,12 @@ void PlayState::on_enter()
 	std::memset(curr_state, 0x0, sizeof *curr_state * GRID_COLS * GRID_ROWS);
 
 	start_time = 0;
+	threshold = 0.2;
 
-	PlayState::paused = false;
-	PlayState::started = false;
-	PlayState::start_time = 0;
-	PlayState::threshold = 0.2;
-	PlayState::generation = 1;
+	paused = false;
+	started = false;
+	start_time = 0;
+	generation = 0;
 }
 
 
@@ -179,5 +175,4 @@ bool& grid_at(bool* arr, int x, int y)
 	else if (y >= GRID_ROWS) y = 0;
 
 	return arr[y * GRID_COLS + x];
-
 }

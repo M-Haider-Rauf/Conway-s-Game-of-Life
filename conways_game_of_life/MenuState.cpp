@@ -7,18 +7,20 @@ Texture MenuState::title_img;
 MenuState::MenuState()
 	: GameState(StateId::Menu)
 	, menu_texts()
-	, state(0)
+	, option(0)
 {
 	title_img = LoadTexture("img.png");
 	menu_texts.push_back("Play");
 	menu_texts.push_back("About");
 	menu_texts.push_back("Exit");
+
+	option = menu_texts.size() * 1000;
 }
 
 void MenuState::handle_input()
 {
-	if (IsKeyPressed(KEY_DOWN)) ++state;
-	else if (IsKeyPressed(KEY_UP)) --state;
+	if (IsKeyPressed(KEY_DOWN)) ++option;
+	else if (IsKeyPressed(KEY_UP)) --option;
 	else if (IsKeyPressed(KEY_ENTER)) {
 		switch (this->get_selected()) {
 		case 0:
@@ -30,7 +32,7 @@ void MenuState::handle_input()
 			break;
 
 		case 2:
-			GameEngine::should_quit = true;
+			GameEngine::get_instance()->quit();
 			break;
 
 		default:
@@ -59,5 +61,5 @@ void MenuState::render() const
 
 void MenuState::on_enter()
 {
-	state = 0;
+	option = 0;
 }
